@@ -14,7 +14,10 @@ import {
   WebhookEvent,
 } from "@line/bot-sdk";
 import express from "express";
-import * as dotenv from "dotenv";
+import axios from "axios";
+import dotenv from "dotenv";
+import cheerio from "cheerio";
+import fs from "fs";
 dotenv.config();
 
 const clientConfig: ClientConfig = {
@@ -29,6 +32,17 @@ const client = new Client(clientConfig);
 const textRegex = /^g\/[0-9]{6}$/m;
 
 const app = express();
+app.use(express.json());
+
+app.get("/", async (req, res) => {
+  const { data } = await axios.get("https://nhentai.net/g/113450/");
+  const $ = cheerio.load(data);
+  const h1 = $("h1[class = title]").text();
+  console.log(h1);
+
+  // fs.writeFileSync("kek2.html", data);
+  return res.send("complete");
+});
 
 app.post("/callback", middleware(middlewareConfig), (req, res) => {
   Promise.all(req.body.events.map(handleEvent))
@@ -40,7 +54,7 @@ app.post("/callback", middleware(middlewareConfig), (req, res) => {
 });
 
 // event handler
-function handleEvent(event: any) {
+async function handleEvent(event: any) {
   console.log(event);
   if (event.type !== "message" || event.message.type !== "text") {
     // ignore non-text-message event
@@ -52,9 +66,13 @@ function handleEvent(event: any) {
   if (!textRegex.test(text)) {
     return Promise.resolve(null);
   }
+  //get data
+  const { data } = await axios.get("https://nhentai.net/g/113450/");
+  const $ = cheerio.load(data);
+  const h1 = $("h1[class = title]").text();
 
   // create a echoing text message
-  const message: Message = { type: "text", text: text };
+  const message: Message = { type: "text", text: h1 };
 
   // use reply API
   return client.replyMessage(event.replyToken, message);
