@@ -92,7 +92,7 @@ async function handleEvent(event: any) {
 
   console.log(result.length);
   if (result.length > 5) {
-    let messages: Message[] = [];
+    const messages: Message[] = [];
     messages.push({ type: "text", text: h1 });
     await Promise.all(
       result.slice(0, 5).map((idx, el) => {
@@ -105,7 +105,25 @@ async function handleEvent(event: any) {
       })
     );
     // use reply API
-    return client.replyMessage(event.replyToken, messages);
+    const message: Message[] = [
+      { type: "text", text: h1 },
+      {
+        type: "image",
+        originalContentUrl: "https://t.nhentai.net/galleries/725434/1t.png",
+        previewImageUrl: "https://t.nhentai.net/galleries/725434/1t.png",
+      },
+      {
+        type: "image",
+        originalContentUrl: "https://t.nhentai.net/galleries/725434/1t.png",
+        previewImageUrl: "https://t.nhentai.net/galleries/725434/1t.png",
+      },
+      {
+        type: "image",
+        originalContentUrl: "https://t.nhentai.net/galleries/725434/1t.png",
+        previewImageUrl: "https://t.nhentai.net/galleries/725434/1t.png",
+      },
+    ];
+    return client.replyMessage(event.replyToken, message);
   }
 }
 
