@@ -26,6 +26,8 @@ const middlewareConfig: MiddlewareConfig = {
 
 const client = new Client(clientConfig);
 
+const textRegex = /^g\/[0-9]{6}$/m;
+
 const app = express();
 
 app.post("/callback", middleware(middlewareConfig), (req, res) => {
@@ -39,13 +41,20 @@ app.post("/callback", middleware(middlewareConfig), (req, res) => {
 
 // event handler
 function handleEvent(event: any) {
+  console.log(event);
   if (event.type !== "message" || event.message.type !== "text") {
     // ignore non-text-message event
     return Promise.resolve(null);
   }
+  const text: string = event.message.text;
+
+  //ignore if does not match regex
+  if (!textRegex.test(text)) {
+    return Promise.resolve(null);
+  }
 
   // create a echoing text message
-  const message: Message = { type: "text", text: event.message.text };
+  const message: Message = { type: "text", text: text };
 
   // use reply API
   return client.replyMessage(event.replyToken, message);
