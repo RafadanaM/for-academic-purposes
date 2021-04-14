@@ -17,6 +17,7 @@ import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import cheerio from "cheerio";
+import { type } from "node:os";
 dotenv.config();
 
 const clientConfig: ClientConfig = {
@@ -31,6 +32,7 @@ const client = new Client(clientConfig);
 const textRegex = /^g\/[0-9]{6}$/m;
 
 const app = express();
+// app.use(express.json());
 
 // app.get("/", async (req, res) => {
 //   const { data } = await axios.get("https://nhentai.net/g/113450/");
@@ -73,7 +75,19 @@ async function handleEvent(event: any) {
   const h1 = $("h1[class = title]").text();
 
   // create a echoing text message
-  const message: Message = { type: "text", text: h1 };
+  const message: Message[] = [
+    { type: "text", text: h1 },
+    {
+      type: "image",
+      originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
+      previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
+    },
+    {
+      type: "image",
+      originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
+      previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
+    },
+  ];
 
   // use reply API
   return client.replyMessage(event.replyToken, message);
