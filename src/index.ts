@@ -114,15 +114,15 @@ async function handleEvent(event: any) {
   //     originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
   //     previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
   //   },
-    // {
-    //   type: "template",
-    //   altText: "image carousel",
-    //   template: {
-    //     type: "image_carousel",
-    //     columns: images,
-    //   },
-    // },
-  ];
+  // {
+  //   type: "template",
+  //   altText: "image carousel",
+  //   template: {
+  //     type: "image_carousel",
+  //     columns: images,
+  //   },
+  // },
+  // ];
 
   // use reply API
   return client.replyMessage(event.replyToken, messages);
