@@ -12,6 +12,7 @@ import {
   MiddlewareConfig,
   Message,
   WebhookEvent,
+  TemplateImageColumn,
 } from "@line/bot-sdk";
 import express from "express";
 import axios from "axios";
@@ -32,13 +33,25 @@ const client = new Client(clientConfig);
 const textRegex = /^g\/[0-9]{6}$/m;
 
 const app = express();
-// app.use(express.json());
 
 // app.get("/", async (req, res) => {
 //   const { data } = await axios.get("https://nhentai.net/g/113450/");
 //   const $ = cheerio.load(data);
 //   const h1 = $("h1[class = title]").text();
 //   console.log(h1);
+//   const result = $("body").find(
+//     "#content > #thumbnail-container > .thumbs > .thumb-container"
+//   );
+//   let columns: any = [];
+//   console.log(result.length);
+//   if (result.length > 5) {
+//     await Promise.all(
+//       result.slice(0, 5).map((idx, el) => {
+//         columns.push($(el).find(".gallerythumb > img").attr("data-src"));
+//       })
+//     );
+//   }
+//   console.log(columns);
 
 //   // fs.writeFileSync("kek2.html", data);
 //   return res.send("complete");
@@ -73,6 +86,26 @@ async function handleEvent(event: any) {
   console.log("load");
   const $ = cheerio.load(data);
   const h1 = $("h1[class = title]").text();
+  const result = $("body").find(
+    "#content > #thumbnail-container > .thumbs > .thumb-container"
+  );
+  let images: TemplateImageColumn[] = [];
+  console.log(result.length);
+  if (result.length > 5) {
+    await Promise.all(
+      result.slice(0, 5).map((idx, el) => {
+        const image = $(el).find(".gallerythumb > img").attr("data-src");
+        images.push({
+          imageUrl: image || "",
+          action: {
+            type: "uri",
+            label: `Page ${idx}`,
+            uri: image || "",
+          },
+        });
+      })
+    );
+  }
 
   // create a echoing text message
   const message: Message[] = [
@@ -83,9 +116,12 @@ async function handleEvent(event: any) {
       previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
     },
     {
-      type: "image",
-      originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
-      previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
+      type: "template",
+      altText: "image carousel",
+      template: {
+        type: "image_carousel",
+        columns: images,
+      },
     },
   ];
 
