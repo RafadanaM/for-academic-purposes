@@ -13,6 +13,7 @@ import {
   Message,
   WebhookEvent,
   TemplateImageColumn,
+  ImageMessage,
 } from "@line/bot-sdk";
 import express from "express";
 import axios from "axios";
@@ -89,44 +90,42 @@ async function handleEvent(event: any) {
   const result = $("body").find(
     "#content > #thumbnail-container > .thumbs > .thumb-container"
   );
-  let images: TemplateImageColumn[] = [];
+  let messages: Message[] = [];
+  messages.push({ type: "text", text: h1 });
   console.log(result.length);
   if (result.length > 5) {
     await Promise.all(
       result.slice(0, 5).map((idx, el) => {
         const image = $(el).find(".gallerythumb > img").attr("data-src");
-        images.push({
-          imageUrl: image || "",
-          action: {
-            type: "uri",
-            label: `Page ${idx}`,
-            uri: image || "",
-          },
+        messages.push({
+          type: "image",
+          originalContentUrl: image || "",
+          previewImageUrl: image || "",
         });
       })
     );
   }
 
   // create a echoing text message
-  const message: Message[] = [
-    { type: "text", text: h1 },
-    {
-      type: "image",
-      originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
-      previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
-    },
-    {
-      type: "template",
-      altText: "image carousel",
-      template: {
-        type: "image_carousel",
-        columns: images,
-      },
-    },
+  // const message: Message[] = [
+  //   { type: "text", text: h1 },
+  //   {
+  //     type: "image",
+  //     originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
+  //     previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
+  //   },
+    // {
+    //   type: "template",
+    //   altText: "image carousel",
+    //   template: {
+    //     type: "image_carousel",
+    //     columns: images,
+    //   },
+    // },
   ];
 
   // use reply API
-  return client.replyMessage(event.replyToken, message);
+  return client.replyMessage(event.replyToken, messages);
 }
 
 // listen on port
