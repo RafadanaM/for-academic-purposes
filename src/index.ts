@@ -19,7 +19,6 @@ import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import cheerio from "cheerio";
-import { type } from "node:os";
 dotenv.config();
 
 const clientConfig: ClientConfig = {
@@ -90,10 +89,11 @@ async function handleEvent(event: any) {
   const result = $("body").find(
     "#content > #thumbnail-container > .thumbs > .thumb-container"
   );
-  let messages: Message[] = [];
-  messages.push({ type: "text", text: h1 });
+
   console.log(result.length);
   if (result.length > 5) {
+    let messages: Message[] = [];
+    messages.push({ type: "text", text: h1 });
     await Promise.all(
       result.slice(0, 5).map((idx, el) => {
         const image = $(el).find(".gallerythumb > img").attr("data-src");
@@ -104,28 +104,9 @@ async function handleEvent(event: any) {
         });
       })
     );
+    // use reply API
+    return client.replyMessage(event.replyToken, messages);
   }
-
-  // create a echoing text message
-  // const message: Message[] = [
-  //   { type: "text", text: h1 },
-  //   {
-  //     type: "image",
-  //     originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
-  //     previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
-  //   },
-  // {
-  //   type: "template",
-  //   altText: "image carousel",
-  //   template: {
-  //     type: "image_carousel",
-  //     columns: images,
-  //   },
-  // },
-  // ];
-
-  // use reply API
-  return client.replyMessage(event.replyToken, messages);
 }
 
 // listen on port
