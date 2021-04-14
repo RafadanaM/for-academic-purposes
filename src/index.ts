@@ -16,8 +16,6 @@ import {
 import express from "express";
 import * as dotenv from "dotenv";
 dotenv.config();
-console.log(process.env.LINE_CHANNEL_ACCESS_TOKEN);
-console.log(process.env.LINE_CHANNEL_SECRET);
 
 const clientConfig: ClientConfig = {
   channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || "",
