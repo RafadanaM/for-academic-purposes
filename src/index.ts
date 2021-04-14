@@ -67,7 +67,7 @@ async function handleEvent(event: any) {
     return Promise.resolve(null);
   }
   //get data
-  const { data } = await axios.get("https://nhentai.net/g/113450/");
+  const { data } = await axios.get(`https://nhentai.net/${text}`);
   const $ = cheerio.load(data);
   const h1 = $("h1[class = title]").text();
 
