@@ -31,7 +31,6 @@ const client = new Client(clientConfig);
 const textRegex = /^g\/[0-9]{6}$/m;
 
 const app = express();
-app.use(express.json());
 
 // app.get("/", async (req, res) => {
 //   const { data } = await axios.get("https://nhentai.net/g/113450/");
@@ -66,7 +65,10 @@ async function handleEvent(event: any) {
     return Promise.resolve(null);
   }
   //get data
+  console.log("fetch");
+
   const { data } = await axios.get(`https://nhentai.net/${text}/`);
+  console.log("load");
   const $ = cheerio.load(data);
   const h1 = $("h1[class = title]").text();
 
