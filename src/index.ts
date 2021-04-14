@@ -17,7 +17,6 @@ import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import cheerio from "cheerio";
-import fs from "fs";
 dotenv.config();
 
 const clientConfig: ClientConfig = {
@@ -34,15 +33,15 @@ const textRegex = /^g\/[0-9]{6}$/m;
 const app = express();
 app.use(express.json());
 
-app.get("/", async (req, res) => {
-  const { data } = await axios.get("https://nhentai.net/g/113450/");
-  const $ = cheerio.load(data);
-  const h1 = $("h1[class = title]").text();
-  console.log(h1);
+// app.get("/", async (req, res) => {
+//   const { data } = await axios.get("https://nhentai.net/g/113450/");
+//   const $ = cheerio.load(data);
+//   const h1 = $("h1[class = title]").text();
+//   console.log(h1);
 
-  // fs.writeFileSync("kek2.html", data);
-  return res.send("complete");
-});
+//   // fs.writeFileSync("kek2.html", data);
+//   return res.send("complete");
+// });
 
 app.post("/callback", middleware(middlewareConfig), (req, res) => {
   Promise.all(req.body.events.map(handleEvent))
@@ -67,7 +66,7 @@ async function handleEvent(event: any) {
     return Promise.resolve(null);
   }
   //get data
-  const { data } = await axios.get(`https://nhentai.net/${text}`);
+  const { data } = await axios.get(`https://nhentai.net/${text}/`);
   const $ = cheerio.load(data);
   const h1 = $("h1[class = title]").text();
 
