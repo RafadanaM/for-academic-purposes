@@ -120,7 +120,8 @@ async function handleEvent(event: WebhookEvent) {
           type: "text",
           text: `Title: ${title}
   Page: ${pageLength} pages
-  Tags: ${tags.toString()}`,
+  Tags: ${tags.toString()}
+  Link: https://nhentai.net/${text}/ `,
         },
         {
           type: "template",
