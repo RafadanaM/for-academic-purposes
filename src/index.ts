@@ -66,7 +66,9 @@ async function handleEvent(event: WebhookEvent) {
       }
 
       /* If message is g/xxxxxx */
-    } else if (textRegex.test(text)) {
+    }
+    if (textRegex.test(text)) {
+      //need to check if 404
       const { data } = await axios.get(`https://nhentai.net/${text}/`);
       const $ = cheerio.load(data);
       /* GETTING TITLE */
@@ -147,40 +149,3 @@ const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`listening on ${port}`);
 });
-
-// app.get("/", async (req, res) => {
-//   const { data } = await axios.get("https://nhentai.net/g/113450/");
-//   const $ = cheerio.load(data);
-//   const h1 = $("h1[class = title]").text();
-//   console.log(h1);
-//   // const result = $("body").find(
-//   //   "#content > #thumbnail-container > .thumbs > .thumb-container"
-//   // );
-//   const result = $("div[id=thumbnail-container]").find(
-//     ".thumbs > .thumb-container"
-//   );
-//   let tags = $('section[id="tags"]').find(
-//     `div:contains("Tags") > span[class=tags] > a > span[class=name]`
-//   );
-//   let totalTag: any[] = [];
-//   await Promise.all(
-//     tags.map((idx, el) => {
-//       totalTag.push($(el).text());
-//     })
-//   );
-//   console.log(totalTag);
-//   console.log(tags.length);
-//   let columns: any = [];
-//   console.log(result.length);
-//   if (result.length > 5) {
-//     await Promise.all(
-//       result.slice(0, 5).map((idx, el) => {
-//         columns.push($(el).find(".gallerythumb > img").attr("data-src"));
-//       })
-//     );
-//   }
-//   console.log(columns);
-
-//   // fs.writeFileSync("kek2.html", data);
-//   return res.send("complete");
-// });
