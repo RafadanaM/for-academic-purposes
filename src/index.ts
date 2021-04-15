@@ -152,8 +152,8 @@ async function handleEvent(event: any) {
     {
       type: "text",
       text: `Title: ${title}
-    Page: ${pageLength} pages
-    Tags: ${tags.toString()}`,
+Page: ${pageLength} pages
+Tags: ${tags.toString()}`,
     },
     // { type: "text", text: `` },
     // { type: "text", text: `` },
