@@ -93,6 +93,10 @@ async function handleEvent(event: any) {
       const roomId = event.source.roomId;
       return client.leaveRoom(roomId);
     }
+    if (event.soure.type === "group") {
+      const groupId = event.source.groupId;
+      return client.leaveGroup(groupId);
+    }
     return Promise.resolve(null);
   }
   //ignore if does not match regex
@@ -115,8 +119,9 @@ async function handleEvent(event: any) {
   let tagResult = $('section[id="tags"]').find(
     `div:contains("Tags") > span[class=tags] > a > span[class=name]`
   );
+  const tagsLength = tagResult.length;
   let tags: any[] = [];
-  if (tagResult.length > 5) {
+  if (tagsLength > 5) {
     tagResult = tagResult.slice(0, 5);
   }
   await Promise.all(
@@ -124,7 +129,7 @@ async function handleEvent(event: any) {
       tags.push(` ${$(el).text()}`);
     })
   );
-  if (tagResult.length > 5) {
+  if (tagsLength > 5) {
     tags.push("...");
   }
 
