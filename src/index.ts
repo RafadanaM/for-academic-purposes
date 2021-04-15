@@ -88,7 +88,13 @@ async function handleEvent(event: any) {
     return Promise.resolve(null);
   }
   const text: string = event.message.text;
-
+  if (text === "/quit") {
+    if (event.source.type === "room") {
+      const roomId = event.source.roomId;
+      return client.leaveRoom(roomId);
+    }
+    return Promise.resolve(null);
+  }
   //ignore if does not match regex
   if (!textRegex.test(text)) {
     return Promise.resolve(null);
