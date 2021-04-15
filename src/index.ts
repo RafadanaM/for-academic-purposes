@@ -108,7 +108,7 @@ async function handleEvent(event: WebhookEvent) {
             action: {
               type: "uri",
               label: `Page ${idx + 1}`,
-              uri: image,
+              uri: `https://nhentai.net/${text}/${idx + 1}`,
             },
           });
         })
