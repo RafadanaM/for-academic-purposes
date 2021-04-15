@@ -77,7 +77,7 @@ async function handleEvent(event: WebhookEvent) {
         `div:contains("Tags") > span[class=tags] > a > span[class=name]`
       );
       const tagsLength: number = tagResult.length;
-      let tags: string[] = [];
+      let tags: any[] = [];
       if (tagsLength > 5) {
         tagResult = tagResult.slice(0, 5);
       }
@@ -87,7 +87,7 @@ async function handleEvent(event: WebhookEvent) {
         })
       );
       if (tagsLength > 5) {
-        tags.push(" ...");
+        tags.push(` ...`);
       }
 
       /* GETTING IMAGES*/
@@ -119,9 +119,9 @@ async function handleEvent(event: WebhookEvent) {
         {
           type: "text",
           text: `Title: ${title}
-  Page: ${pageLength} pages
-  Tags: ${tags.toString()}
-  Link: https://nhentai.net/${text}/ `,
+Page: ${pageLength} pages
+Tags: ${tags.toString()}
+Link: https://nhentai.net/${text}/ `,
         },
         {
           type: "template",
