@@ -32,30 +32,44 @@ const client = new Client(clientConfig);
 const textRegex = /^g\/[0-9]{6}$/m;
 
 const app = express();
-app.use(express.json());
+// app.use(express.json());
 
-app.get("/", async (req, res) => {
-  const { data } = await axios.get("https://nhentai.net/g/113450/");
-  const $ = cheerio.load(data);
-  const h1 = $("h1[class = title]").text();
-  console.log(h1);
-  const result = $("body").find(
-    "#content > #thumbnail-container > .thumbs > .thumb-container"
-  );
-  let columns: any = [];
-  console.log(result.length);
-  if (result.length > 5) {
-    await Promise.all(
-      result.slice(0, 5).map((idx, el) => {
-        columns.push($(el).find(".gallerythumb > img").attr("data-src"));
-      })
-    );
-  }
-  console.log(columns);
+// app.get("/", async (req, res) => {
+//   const { data } = await axios.get("https://nhentai.net/g/113450/");
+//   const $ = cheerio.load(data);
+//   const h1 = $("h1[class = title]").text();
+//   console.log(h1);
+//   // const result = $("body").find(
+//   //   "#content > #thumbnail-container > .thumbs > .thumb-container"
+//   // );
+//   const result = $("div[id=thumbnail-container]").find(
+//     ".thumbs > .thumb-container"
+//   );
+//   let tags = $('section[id="tags"]').find(
+//     `div:contains("Tags") > span[class=tags] > a > span[class=name]`
+//   );
+//   let totalTag: any[] = [];
+//   await Promise.all(
+//     tags.map((idx, el) => {
+//       totalTag.push($(el).text());
+//     })
+//   );
+//   console.log(totalTag);
+//   console.log(tags.length);
+//   let columns: any = [];
+//   console.log(result.length);
+//   if (result.length > 5) {
+//     await Promise.all(
+//       result.slice(0, 5).map((idx, el) => {
+//         columns.push($(el).find(".gallerythumb > img").attr("data-src"));
+//       })
+//     );
+//   }
+//   console.log(columns);
 
-  // fs.writeFileSync("kek2.html", data);
-  return res.send("complete");
-});
+//   // fs.writeFileSync("kek2.html", data);
+//   return res.send("complete");
+// });
 
 app.post("/callback", middleware(middlewareConfig), (req, res) => {
   Promise.all(req.body.events.map(handleEvent))
@@ -85,58 +99,53 @@ async function handleEvent(event: any) {
   const { data } = await axios.get(`https://nhentai.net/${text}/`);
   console.log("load");
   const $ = cheerio.load(data);
-  const h1 = $("h1[class = title]").text();
-  const result = $("body").find(
+  const title = $("h1[class = title]").text();
+  let imageResult = $("body").find(
     "#content > #thumbnail-container > .thumbs > .thumb-container"
   );
-  let images: TemplateImageColumn[] = [];
-  console.log(result.length);
-  if (result.length > 5) {
-    const messages: Message[] = [];
-    messages.push({ type: "text", text: h1 });
-    await Promise.all(
-      result.slice(0, 5).map((idx, el) => {
-        const image = $(el).find(".gallerythumb > img").attr("data-src");
-        images.push({
-          imageUrl: image || "",
-          action: {
-            type: "uri",
-            label: `Page ${idx}`,
-            uri: image || "",
-          },
-        });
-      })
-    );
-    // use reply API
-    const message: Message[] = [
-      { type: "text", text: h1 },
-      {
-        type: "image",
-        originalContentUrl: "https://t.nhentai.net/galleries/725434/1t.png",
-        previewImageUrl: "https://t.nhentai.net/galleries/725434/1t.png",
-      },
-      {
-        type: "image",
-        originalContentUrl: "https://t.nhentai.net/galleries/725434/1t.png",
-        previewImageUrl: "https://t.nhentai.net/galleries/725434/1t.png",
-      },
-      {
-        type: "image",
-        originalContentUrl: "https://t.nhentai.net/galleries/725434/1t.png",
-        previewImageUrl: "https://t.nhentai.net/galleries/725434/1t.png",
-      },
-    ];
-    return client.replyMessage(event.replyToken, message);
+  const pageLength = imageResult.length;
+
+  /* GETTING TAGS*/
+  let tagResult = $('section[id="tags"]').find(
+    `div:contains("Tags") > span[class=tags] > a > span[class=name]`
+  );
+  let tags: any[] = [];
+  if (tagResult.length > 5) {
+    tagResult = tagResult.slice(0, 5);
   }
+  await Promise.all(
+    tagResult.map((idx, el) => {
+      tags.push($(el).text());
+    })
+  );
+  if (tagResult.length > 5) {
+    tags.push("...");
+  }
+
+  /* GETTING IMAGES*/
+  let images: TemplateImageColumn[] = [];
+  if (imageResult.length > 5) {
+    imageResult = imageResult.slice(0, 5);
+  }
+  await Promise.all(
+    imageResult.map((idx, el) => {
+      const image = $(el).find(".gallerythumb > img").attr("data-src");
+      images.push({
+        imageUrl: image || "",
+        action: {
+          type: "uri",
+          label: `Page ${idx}`,
+          uri: image || "",
+        },
+      });
+    })
+  );
 
   // create a echoing text message
   const message: Message[] = [
-    { type: "text", text: h1 },
-    {
-      type: "image",
-      originalContentUrl: "https://t.nhentai.net/galleries/725434/cover.png",
-      previewImageUrl: "https://t.nhentai.net/galleries/725434/cover.png",
-    },
+    { type: "text", text: `Title: ${title}` },
+    { type: "text", text: `Page: ${pageLength} pages` },
+    { type: "text", text: `Tags: ${pageLength} ${tags.toString()}` },
     {
       type: "template",
       altText: "image carousel",
