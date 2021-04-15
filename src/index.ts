@@ -84,7 +84,7 @@ async function handleEvent(event: WebhookEvent) {
         tagResult = tagResult.slice(0, 5);
       }
       await Promise.all(
-        tagResult.map((el) => {
+        tagResult.map((idx, el) => {
           tags.push(` ${$(el).text()}`);
         })
       );
