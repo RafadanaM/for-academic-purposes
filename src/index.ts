@@ -115,7 +115,7 @@ async function handleEvent(event: any) {
   }
   await Promise.all(
     tagResult.map((idx, el) => {
-      tags.push($(el).text());
+      tags.push(` ${$(el).text()}`);
     })
   );
   if (tagResult.length > 5) {
@@ -134,7 +134,7 @@ async function handleEvent(event: any) {
         imageUrl: image || "",
         action: {
           type: "uri",
-          label: `Page ${idx}`,
+          label: `Page ${idx + 1}`,
           uri: image || "",
         },
       });
@@ -143,9 +143,14 @@ async function handleEvent(event: any) {
 
   // create a echoing text message
   const message: Message[] = [
-    { type: "text", text: `Title: ${title}` },
-    { type: "text", text: `Page: ${pageLength} pages` },
-    { type: "text", text: `Tags: ${pageLength} ${tags.toString()}` },
+    {
+      type: "text",
+      text: `Title: ${title}
+    Page: ${pageLength} pages
+    Tags: ${tags.toString()}`,
+    },
+    // { type: "text", text: `` },
+    // { type: "text", text: `` },
     {
       type: "template",
       altText: "image carousel",
