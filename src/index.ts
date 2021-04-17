@@ -11,6 +11,7 @@ import {
   ClientConfig,
   MiddlewareConfig,
   Message,
+  TextMessage,
   WebhookEvent,
   TemplateImageColumn,
 } from "@line/bot-sdk";
@@ -59,6 +60,18 @@ async function handleEvent(event: WebhookEvent) {
     const text: string = event.message.text;
 
     switch (text) {
+      case "/help":
+        const message: TextMessage = {
+          type: "text",
+          text: `List of commands:
+/help: Show all commands
+g/xxxxxx: Show detail of doujin ex: g/347653
+/random: Show random doujin
+More to cum!!`,
+        };
+
+        return client.replyMessage(event.replyToken, message);
+
       case "/quit":
         switch (event.source.type) {
           case "room":
