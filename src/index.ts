@@ -55,6 +55,17 @@ app.post("/callback", middleware(middlewareConfig), (req, res) => {
 async function handleEvent(event: WebhookEvent) {
   try {
     switch (event.type) {
+      case "join": {
+        const message: TextMessage = {
+          type: "text",
+          text: `Why did you add me you degenerate:
+Type /help to list all commands
+`,
+        };
+
+        return client.replyMessage(event.replyToken, message);
+      }
+
       case "message":
         const message = event.message;
         if (message.type !== "text") {
@@ -141,17 +152,6 @@ Link: https://nhentai.net/${id}/ `,
             ];
 
             // use reply API
-            return client.replyMessage(event.replyToken, message);
-          }
-
-          case "join": {
-            const message: TextMessage = {
-              type: "text",
-              text: `Why did you add me you degenerate:
-Type /help to list all commands
-    `,
-            };
-
             return client.replyMessage(event.replyToken, message);
           }
 
