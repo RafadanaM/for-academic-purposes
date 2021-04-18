@@ -66,11 +66,11 @@ async function handleEvent(event: WebhookEvent) {
             const message: TextMessage = {
               type: "text",
               text: `List of commands:
-    /help: Show all commands
-    g/xxxxxx: Show detail of doujin ex: g/347653
-    /random: Show random doujin
-    /quit: remove bot from group/mpc
-    More to cum!!`,
+/help: Show all commands
+g/xxxxxx: Show detail of doujin ex: g/347653
+/random: Show random doujin
+/quit: remove bot from group/mpc
+More to cum!!`,
             };
 
             return client.replyMessage(event.replyToken, message);
@@ -97,9 +97,9 @@ async function handleEvent(event: WebhookEvent) {
               {
                 type: "text",
                 text: `Title: ${title}
-    Page: ${page} pages
-    Tags: ${tags.toString()}
-    Link: https://nhentai.net/${text}/ `,
+Page: ${page} pages
+Tags: ${tags.toString()}
+Link: https://nhentai.net/${text}/ `,
               },
               {
                 type: "template",
@@ -126,9 +126,9 @@ async function handleEvent(event: WebhookEvent) {
               {
                 type: "text",
                 text: `Title: ${title}
-    Page: ${page} pages
-    Tags: ${tags.toString()}
-    Link: https://nhentai.net/${id}/ `,
+Page: ${page} pages
+Tags: ${tags.toString()}
+Link: https://nhentai.net/${id}/ `,
               },
               {
                 type: "template",
@@ -148,7 +148,7 @@ async function handleEvent(event: WebhookEvent) {
             const message: TextMessage = {
               type: "text",
               text: `Why did you add me you degenerate:
-    Type /help to list all commands
+Type /help to list all commands
     `,
             };
 
