@@ -51,95 +51,113 @@ app.post("/callback", middleware(middlewareConfig), (req, res) => {
 });
 
 // event handler
+// I need to refactor this shit
 async function handleEvent(event: WebhookEvent) {
   try {
-    if (event.type !== "message" || event.message.type !== "text") {
-      // ignore non-text-message event
-      return Promise.resolve(null);
-    }
-    const text: string = event.message.text;
+    switch (event.type) {
+      case "message":
+        const message = event.message;
+        if (message.type !== "text") {
+          return Promise.resolve(null);
+        }
+        const text: string = message.text;
+        switch (text) {
+          case "/help":
+            const message: TextMessage = {
+              type: "text",
+              text: `List of commands:
+    /help: Show all commands
+    g/xxxxxx: Show detail of doujin ex: g/347653
+    /random: Show random doujin
+    /quit: remove bot from group/mpc
+    More to cum!!`,
+            };
 
-    switch (text) {
-      case "/help":
-        const message: TextMessage = {
-          type: "text",
-          text: `List of commands:
-/help: Show all commands
-g/xxxxxx: Show detail of doujin ex: g/347653
-/random: Show random doujin
-More to cum!!`,
-        };
+            return client.replyMessage(event.replyToken, message);
 
-        return client.replyMessage(event.replyToken, message);
+          case "/quit":
+            switch (event.source.type) {
+              case "room":
+                const roomId: string = event.source.roomId;
+                return client.leaveRoom(roomId);
+              case "group":
+                const groupId: string = event.source.groupId;
+                return client.leaveGroup(groupId);
 
-      case "/quit":
-        switch (event.source.type) {
-          case "room":
-            const roomId: string = event.source.roomId;
-            return client.leaveRoom(roomId);
-          case "group":
-            const groupId: string = event.source.groupId;
-            return client.leaveGroup(groupId);
+              default:
+                return Promise.resolve(null);
+            }
+          case (text.match(textRegex) || {}).input: {
+            //need to check if 404
+            const { data } = await axios.get(`https://nhentai.net/${text}/`);
+            const { title, tags, page, images } = await getData(data, text);
+
+            // create a echoing text message
+            const message: Message[] = [
+              {
+                type: "text",
+                text: `Title: ${title}
+    Page: ${page} pages
+    Tags: ${tags.toString()}
+    Link: https://nhentai.net/${text}/ `,
+              },
+              {
+                type: "template",
+                altText: "image carousel",
+                template: {
+                  type: "image_carousel",
+                  columns: images,
+                },
+              },
+            ];
+
+            // use reply API
+            return client.replyMessage(event.replyToken, message);
+          }
+
+          case "/random": {
+            const { request, data } = await axios.get(
+              `https://nhentai.net/random/`
+            );
+            const id = request.path.substring(1);
+            const { title, tags, page, images } = await getData(data, id);
+
+            const message: Message[] = [
+              {
+                type: "text",
+                text: `Title: ${title}
+    Page: ${page} pages
+    Tags: ${tags.toString()}
+    Link: https://nhentai.net/${id}/ `,
+              },
+              {
+                type: "template",
+                altText: "image carousel",
+                template: {
+                  type: "image_carousel",
+                  columns: images,
+                },
+              },
+            ];
+
+            // use reply API
+            return client.replyMessage(event.replyToken, message);
+          }
+
+          case "join": {
+            const message: TextMessage = {
+              type: "text",
+              text: `Why did you add me you degenerate:
+    Type /help to list all commands
+    `,
+            };
+
+            return client.replyMessage(event.replyToken, message);
+          }
 
           default:
             return Promise.resolve(null);
         }
-      case (text.match(textRegex) || {}).input: {
-        //need to check if 404
-        const { data } = await axios.get(`https://nhentai.net/${text}/`);
-        const { title, tags, page, images } = await getData(data, text);
-
-        // create a echoing text message
-        const message: Message[] = [
-          {
-            type: "text",
-            text: `Title: ${title}
-Page: ${page} pages
-Tags: ${tags.toString()}
-Link: https://nhentai.net/${text}/ `,
-          },
-          {
-            type: "template",
-            altText: "image carousel",
-            template: {
-              type: "image_carousel",
-              columns: images,
-            },
-          },
-        ];
-
-        // use reply API
-        return client.replyMessage(event.replyToken, message);
-      }
-
-      case "/random": {
-        const { request, data } = await axios.get(
-          `https://nhentai.net/random/`
-        );
-        const id = request.path.substring(1);
-        const { title, tags, page, images } = await getData(data, id);
-
-        const message: Message[] = [
-          {
-            type: "text",
-            text: `Title: ${title}
-Page: ${page} pages
-Tags: ${tags.toString()}
-Link: https://nhentai.net/${id}/ `,
-          },
-          {
-            type: "template",
-            altText: "image carousel",
-            template: {
-              type: "image_carousel",
-              columns: images,
-            },
-          },
-        ];
-
-        // use reply API
-        return client.replyMessage(event.replyToken, message);
-      }
 
       default:
         return Promise.resolve(null);
