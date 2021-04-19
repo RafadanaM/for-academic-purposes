@@ -179,7 +179,7 @@ Link: https://nhentai.net/${text}/ `,
                 type: "text",
                 text: `Title: ${title}
 Page: ${page} pages
-Tags: ${tags.join("\n \n")}
+Tags: ${tags.toString()}
 Link: https://nhentai.net/${id}/ `,
               },
               {
