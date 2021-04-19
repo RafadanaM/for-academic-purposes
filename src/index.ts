@@ -203,7 +203,7 @@ Link: https://nhentai.net/${id}/ `,
               {
                 type: "text",
                 text: `Popular Now:
-${titles.toString()} `,
+${titles.join("\n \n")} `,
               },
               {
                 type: "template",
