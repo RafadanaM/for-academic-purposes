@@ -6,3 +6,8 @@ export interface DataObject {
   page: number;
   images: TemplateImageColumn[];
 }
+
+export interface PopularDataObject {
+  titles: string[];
+  images: TemplateImageColumn[];
+}

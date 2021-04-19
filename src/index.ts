@@ -18,7 +18,8 @@ import {
 import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
-import { getData } from "./function";
+import { getData, getPopularData } from "./function";
+import cheerio from "cheerio";
 dotenv.config();
 
 const clientConfig: ClientConfig = {
@@ -36,9 +37,47 @@ const app = express();
 // app.use(express.json());
 
 // app.get("/", async (req, res) => {
-//   const { request, data } = await axios.get(`https://nhentai.net/random/`);
-//   console.log(request.path);
-//   return res.send(request.path);
+//   const { data } = await axios.get(`https://nhentai.net/`);
+//   const $ = cheerio.load(data);
+//   const popular = $("div[id=content]").find(
+//     "div.container.index-container.index-popular > div.gallery"
+//   );
+//   console.log(popular.length);
+//   const titles: string[] = [];
+//   const images: TemplateImageColumn[] = [];
+//   await Promise.all(
+//     popular.map((idx, el) => {
+//       const title = $(el).find("div.caption").text();
+//       const image = $(el).find("a > img.lazyload").attr("data-src") || "";
+//       const id = $(el).find("a").attr("href");
+//       titles.push(`• ${title}\n`);
+//       images.push({
+//         imageUrl: image,
+//         action: {
+//           type: "uri",
+//           label: `${idx + 1}`,
+//           uri: `https://nhentai.net${id}`,
+//         },
+//       });
+//     })
+//   );
+//   const message: Message[] = [
+//     {
+//       type: "text",
+//       text: `Popular Now:
+// ${titles.toString()} `,
+//     },
+//     {
+//       type: "template",
+//       altText: "image carousel",
+//       template: {
+//         type: "image_carousel",
+//         columns: images,
+//       },
+//     },
+//   ];
+
+//   return res.send("completed");
 // });
 
 app.post("/callback", middleware(middlewareConfig), (req, res) => {
@@ -152,6 +191,28 @@ Link: https://nhentai.net/${id}/ `,
             ];
 
             // use reply API
+            return client.replyMessage(event.replyToken, message);
+          }
+
+          case "/popular": {
+            const { data } = await axios.get(`https://nhentai.net/`);
+            const { titles, images } = await getPopularData(data);
+            const message: Message[] = [
+              {
+                type: "text",
+                text: `Popular Now:
+${titles.toString()} `,
+              },
+              {
+                type: "template",
+                altText: "image carousel",
+                template: {
+                  type: "image_carousel",
+                  columns: images,
+                },
+              },
+            ];
+
             return client.replyMessage(event.replyToken, message);
           }
 

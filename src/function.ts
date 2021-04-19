@@ -1,5 +1,5 @@
 import { TemplateImageColumn } from "@line/bot-sdk/";
-import { DataObject } from "./interface";
+import { DataObject, PopularDataObject } from "./interface";
 import cheerio from "cheerio";
 export async function getData(data: any, id: string): Promise<DataObject> {
   const $ = cheerio.load(data);
@@ -50,6 +50,37 @@ export async function getData(data: any, id: string): Promise<DataObject> {
     title: title,
     tags: tags,
     page: pageLength,
+    images: images,
+  };
+  return result;
+}
+
+export async function getPopularData(data: any): Promise<PopularDataObject> {
+  const $ = cheerio.load(data);
+  const popular = $("div[id=content]").find(
+    "div.container.index-container.index-popular > div.gallery"
+  );
+  console.log(popular.length);
+  const titles: string[] = [];
+  const images: TemplateImageColumn[] = [];
+  await Promise.all(
+    popular.map((idx, el) => {
+      const title = $(el).find("div.caption").text();
+      const image = $(el).find("a > img.lazyload").attr("data-src") || "";
+      const id = $(el).find("a").attr("href");
+      titles.push(`• ${title}\n`);
+      images.push({
+        imageUrl: image,
+        action: {
+          type: "uri",
+          label: `${idx + 1}`,
+          uri: `https://nhentai.net${id}`,
+        },
+      });
+    })
+  );
+  const result: PopularDataObject = {
+    titles: titles,
     images: images,
   };
   return result;
