@@ -68,7 +68,7 @@ export async function getPopularData(data: any): Promise<PopularDataObject> {
       const title = $(el).find("div.caption").text();
       const image = $(el).find("a > img.lazyload").attr("data-src") || "";
       const id = $(el).find("a").attr("href");
-      titles.push(`• ${title}\n`);
+      titles.push(`• ${title}`);
       images.push({
         imageUrl: image,
         action: {

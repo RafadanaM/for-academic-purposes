@@ -118,8 +118,10 @@ Type /help to list all commands
               text: `List of commands:
 /help: Show all commands
 g/xxxxxx: Show detail of doujin ex: g/347653
+/popular: Show current popular doujin
 /random: Show random doujin
 /quit: remove bot from group/mpc
+
 More to cum!!`,
             };
 
@@ -177,7 +179,7 @@ Link: https://nhentai.net/${text}/ `,
                 type: "text",
                 text: `Title: ${title}
 Page: ${page} pages
-Tags: ${tags.toString()}
+Tags: ${tags.join("\n \n")}
 Link: https://nhentai.net/${id}/ `,
               },
               {
