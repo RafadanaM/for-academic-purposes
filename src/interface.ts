@@ -11,3 +11,8 @@ export interface PopularDataObject {
   titles: string[];
   images: TemplateImageColumn[];
 }
+
+export interface LatestDataObject {
+  titles: string[];
+  images: TemplateImageColumn[];
+}

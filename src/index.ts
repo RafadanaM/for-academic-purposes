@@ -18,8 +18,7 @@ import {
 import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
-import { getData, getPopularData } from "./function";
-import cheerio from "cheerio";
+import { getData, getPopularData, getLatestData } from "./function";
 dotenv.config();
 
 const clientConfig: ClientConfig = {
@@ -39,9 +38,10 @@ const app = express();
 // app.get("/", async (req, res) => {
 //   const { data } = await axios.get(`https://nhentai.net/`);
 //   const $ = cheerio.load(data);
-//   const popular = $("div[id=content]").find(
-//     "div.container.index-container.index-popular > div.gallery"
-//   );
+//   const popular = $("div[id=content]")
+//     .find(`div[class="container index-container"] > div.gallery`)
+//     .slice(0, 5);
+
 //   console.log(popular.length);
 //   const titles: string[] = [];
 //   const images: TemplateImageColumn[] = [];
@@ -61,6 +61,9 @@ const app = express();
 //       });
 //     })
 //   );
+//   console.log(titles);
+//   console.log(images);
+
 //   const message: Message[] = [
 //     {
 //       type: "text",
@@ -98,7 +101,7 @@ async function handleEvent(event: WebhookEvent) {
         const message: TextMessage = {
           type: "text",
           text: `Why did you add me you degenerate:
-Type /help to list all commands
+• Type /help to list all commands
 `,
         };
 
@@ -116,11 +119,12 @@ Type /help to list all commands
             const message: TextMessage = {
               type: "text",
               text: `List of commands:
-/help: Show all commands
-g/xxxxxx: Show detail of doujin ex: g/347653
-/popular: Show current popular doujin
-/random: Show random doujin
-/quit: remove bot from group/mpc
+• /help: Show all commands
+• g/xxxxxx: Show detail of doujin ex: g/347653
+• /popular: Show current popular doujins
+• /latest: Show 5 latest doujins
+• /random: Show random doujin
+• /quit: remove bot from group/mpc
 
 More to cum!!`,
             };
@@ -149,9 +153,9 @@ More to cum!!`,
               {
                 type: "text",
                 text: `Title: ${title}
-Page: ${page} pages
-Tags: ${tags.toString()}
-Link: https://nhentai.net/${text}/ `,
+• Page: ${page} pages
+• Tags: ${tags.toString()}
+• Link: https://nhentai.net/${text}/ `,
               },
               {
                 type: "template",
@@ -178,9 +182,9 @@ Link: https://nhentai.net/${text}/ `,
               {
                 type: "text",
                 text: `Title: ${title}
-Page: ${page} pages
-Tags: ${tags.toString()}
-Link: https://nhentai.net/${id}/ `,
+• Page: ${page} pages
+• Tags: ${tags.toString()}
+• Link: https://nhentai.net/${id}/ `,
               },
               {
                 type: "template",
@@ -203,6 +207,28 @@ Link: https://nhentai.net/${id}/ `,
               {
                 type: "text",
                 text: `Popular Now:
+${titles.join("\n \n")} `,
+              },
+              {
+                type: "template",
+                altText: "image carousel",
+                template: {
+                  type: "image_carousel",
+                  columns: images,
+                },
+              },
+            ];
+
+            return client.replyMessage(event.replyToken, message);
+          }
+
+          case "/latest": {
+            const { data } = await axios.get(`https://nhentai.net/`);
+            const { titles, images } = await getLatestData(data);
+            const message: Message[] = [
+              {
+                type: "text",
+                text: `Latest Doujins:
 ${titles.join("\n \n")} `,
               },
               {

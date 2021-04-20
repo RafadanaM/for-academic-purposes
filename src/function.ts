@@ -1,5 +1,5 @@
 import { TemplateImageColumn } from "@line/bot-sdk/";
-import { DataObject, PopularDataObject } from "./interface";
+import { DataObject, LatestDataObject, PopularDataObject } from "./interface";
 import cheerio from "cheerio";
 export async function getData(data: any, id: string): Promise<DataObject> {
   const $ = cheerio.load(data);
@@ -60,7 +60,6 @@ export async function getPopularData(data: any): Promise<PopularDataObject> {
   const popular = $("div[id=content]").find(
     "div.container.index-container.index-popular > div.gallery"
   );
-  console.log(popular.length);
   const titles: string[] = [];
   const images: TemplateImageColumn[] = [];
   await Promise.all(
@@ -80,6 +79,36 @@ export async function getPopularData(data: any): Promise<PopularDataObject> {
     })
   );
   const result: PopularDataObject = {
+    titles: titles,
+    images: images,
+  };
+  return result;
+}
+
+export async function getLatestData(data: any): Promise<LatestDataObject> {
+  const $ = cheerio.load(data);
+  const popular = $("div[id=content]")
+    .find(`div[class="container index-container"] > div.gallery`)
+    .slice(0, 5);
+  const titles: string[] = [];
+  const images: TemplateImageColumn[] = [];
+  await Promise.all(
+    popular.map((idx, el) => {
+      const title = $(el).find("div.caption").text();
+      const image = $(el).find("a > img.lazyload").attr("data-src") || "";
+      const id = $(el).find("a").attr("href");
+      titles.push(`• ${title}`);
+      images.push({
+        imageUrl: image,
+        action: {
+          type: "uri",
+          label: `${idx + 1}`,
+          uri: `https://nhentai.net${id}`,
+        },
+      });
+    })
+  );
+  const result: LatestDataObject = {
     titles: titles,
     images: images,
   };
