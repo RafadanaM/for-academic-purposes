@@ -96,13 +96,13 @@ export async function getLatestData(data: any): Promise<LatestDataObject> {
     popular.map((idx, el) => {
       const title = $(el).find("div.caption").text();
       const image = $(el).find("a > img.lazyload").attr("data-src") || "";
-      const id = $(el).find("a").attr("href");
+      const id = $(el).find("a").attr("href") || "";
       titles.push(`• ${title}`);
       images.push({
         imageUrl: image,
         action: {
           type: "uri",
-          label: title,
+          label: id,
           uri: `https://nhentai.net${id}`,
         },
       });
