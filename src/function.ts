@@ -102,7 +102,7 @@ export async function getLatestData(data: any): Promise<LatestDataObject> {
         imageUrl: image,
         action: {
           type: "uri",
-          label: `${idx + 1}`,
+          label: title,
           uri: `https://nhentai.net${id}`,
         },
       });
