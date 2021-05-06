@@ -125,6 +125,7 @@ async function handleEvent(event: WebhookEvent) {
 • /latest: Show 5 latest doujins
 • /random: Show random doujin
 • /quit: remove bot from group/mpc
+• /github: github repo
 
 More to cum!!`,
             };
@@ -241,6 +242,16 @@ ${titles.join("\n \n")} `,
               },
             ];
 
+            return client.replyMessage(event.replyToken, message);
+          }
+          case "/github": {
+            const message: TextMessage[] = [
+              {
+                type: "text",
+                text: `Github:
+https://github.com/RafadanaM/for-academic-purposes `,
+              },
+            ];
             return client.replyMessage(event.replyToken, message);
           }
 
