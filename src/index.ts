@@ -14,6 +14,7 @@ import {
   TextMessage,
   WebhookEvent,
   TemplateImageColumn,
+  ImageMessage,
 } from "@line/bot-sdk";
 import express from "express";
 import axios from "axios";
@@ -115,6 +116,14 @@ async function handleEvent(event: WebhookEvent) {
         }
         const text: string = message.text;
         switch (text) {
+          case "/mantap":
+            const yafimsg: ImageMessage = {
+              type: "image",
+              originalContentUrl: "https://i.ibb.co/jw4PW2n/aibs-210524.jpg",
+              previewImageUrl: "https://i.ibb.co/jw4PW2n/aibs-210524.jpg"
+
+            }
+            return client.replyMessage(event.replyToken, yafimsg)
           case "/help":
             const message: TextMessage = {
               type: "text",
