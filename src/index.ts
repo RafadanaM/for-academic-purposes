@@ -16,8 +16,8 @@ import {
   TemplateImageColumn,
   ImageMessage,
 } from "@line/bot-sdk";
-import express from "express";
-import axios from "axios";
+import express, { Application, Request, Response } from "express";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import dotenv from "dotenv";
 import { getData, getPopularData, getLatestData } from "./function";
 dotenv.config();
@@ -33,70 +33,47 @@ const client = new Client(clientConfig);
 
 const textRegex = /^g\/[0-9]{6}$/m;
 
-const app = express();
-// app.use(express.json());
+const app: Application = express();
 
-// app.get("/", async (req, res) => {
-//   const { data } = await axios.get(`https://nhentai.net/`);
-//   const $ = cheerio.load(data);
-//   const popular = $("div[id=content]")
-//     .find(`div[class="container index-container"] > div.gallery`)
-//     .slice(0, 5);
 
-//   console.log(popular.length);
-//   const titles: string[] = [];
-//   const images: TemplateImageColumn[] = [];
-//   await Promise.all(
-//     popular.map((idx, el) => {
-//       const title = $(el).find("div.caption").text();
-//       const image = $(el).find("a > img.lazyload").attr("data-src") || "";
-//       const id = $(el).find("a").attr("href");
-//       titles.push(`• ${title}\n`);
-//       images.push({
-//         imageUrl: image,
-//         action: {
-//           type: "uri",
-//           label: `${idx + 1}`,
-//           uri: `https://nhentai.net${id}`,
-//         },
-//       });
-//     })
-//   );
-//   console.log(titles);
-//   console.log(images);
+app.get("/", async (_ : Request, res: Response): Promise<Response> => {
+  try {
+    await axios.get(`https://nhentai.net/`)
+    console.log("connected to target website")
+    return res.status(200).json({
+      status: 'success',
+      message: 'Connected successfully!',
+    });
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return res.status(500).json({
+        status: `Axios Error`,
+        message: `Can't connect to target wensite with code: ${error.response?.status}`,
+      });
+    } else {
+      return res.status(500).json({
+        status: `Error`,
+        message: `Can't connect webhook`,
+      });
+    }
+    
+  }
 
-//   const message: Message[] = [
-//     {
-//       type: "text",
-//       text: `Popular Now:
-// ${titles.toString()} `,
-//     },
-//     {
-//       type: "template",
-//       altText: "image carousel",
-//       template: {
-//         type: "image_carousel",
-//         columns: images,
-//       },
-//     },
-//   ];
-
-//   return res.send("completed");
-// });
+});
 
 app.post("/callback", middleware(middlewareConfig), (req, res) => {
   Promise.all(req.body.events.map(handleEvent))
     .then((result) => res.json(result))
     .catch((err) => {
       console.error(err);
-      res.status(500).end();
+      res.status(500).json("error").end();
     });
 });
 
 // event handler
 // I need to refactor this shit
 async function handleEvent(event: WebhookEvent) {
-  try {
+
     switch (event.type) {
       case "join": {
         const message: TextMessage = {
@@ -105,6 +82,7 @@ async function handleEvent(event: WebhookEvent) {
 • Type /help to list all commands
 `,
         };
+        
 
         return client.replyMessage(event.replyToken, message);
       }
@@ -271,9 +249,7 @@ https://github.com/RafadanaM/for-academic-purposes `,
       default:
         return Promise.resolve(null);
     }
-  } catch (error) {
-    console.log(error);
-  }
+  
 }
 
 // listen on port
