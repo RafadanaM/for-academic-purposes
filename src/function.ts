@@ -114,3 +114,7 @@ export async function getLatestData(data: any): Promise<LatestDataObject> {
   };
   return result;
 }
+
+export function translate(text: string) {
+  return text.replace(/l|L|R|r/g, "w");
+}
